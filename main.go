@@ -7,7 +7,13 @@ import (
 )
 
 func createSecret(w http.ResponseWriter, r *http.Request) {
-	http.ServeFile(w, r, "static/create.html")
+	fmt.Println(r.Method)
+	if r.Method == "GET" {
+		http.ServeFile(w, r, "static/create.html")
+	} else if r.Method == "POST" {
+		http.ServeFile(w, r, "static/created.html")
+	}
+
 }
 
 func main() {
