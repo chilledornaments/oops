@@ -1,7 +1,9 @@
 package onetimepass
 
 import (
+	"crypto/rand"
 	"database/sql"
+	"encoding/hex"
 	"errors"
 	"fmt"
 	"time"
@@ -36,7 +38,7 @@ func init() {
 		fmt.Println(err)
 	}
 
-	statement, _ := database.Prepare("CREATE TABLE IF NOT EXISTS otp (id INTEGER PRIMARY KEY, secret TEXT, expiration INT)")
+	statement, _ := database.Prepare("CREATE TABLE IF NOT EXISTS otp (id INTEGER PRIMARY KEY, secret TEXT, expiration INT, uuid TEXT)")
 
 	_, err = statement.Exec()
 
@@ -52,39 +54,45 @@ func main() {
 
 }
 
-func AddSecret(s string, exp int64) (int, error) {
+func AddSecret(s string, exp int64) (string, error) {
 
-	stmt, err := database.Prepare("INSERT INTO otp (secret, expiration) VALUES (?, ?)")
+	stmt, err := database.Prepare("INSERT INTO otp (secret, expiration, uuid) VALUES (?, ?, ?)")
 	if err != nil {
 		fmt.Println("Error preparing query")
-		return 0, err
+		return "", err
 	}
 
-	r, err := stmt.Exec(s, exp)
+	b := make([]byte, 12) //equals 8 charachters
+	rand.Read(b)
+	u := hex.EncodeToString(b)
+
+	_, err = stmt.Exec(s, exp, u)
 
 	if err != nil {
 		fmt.Println("Error executing query")
-		return 0, err
+		return "", err
 	}
 
-	id, err := r.LastInsertId()
+	/*
+		id, err := r.LastInsertId()
 
-	if err != nil {
-		fmt.Println("Error retrieving last inserted ID")
-		return 0, err
-	}
+		if err != nil {
+			fmt.Println("Error retrieving last inserted ID")
+			return "", err
+		}
+	*/
 
-	return int(id), nil
+	return u, nil
 }
 
-func deleteSecret(id string) error {
-	stmt, err := database.Prepare("DELETE FROM otp WHERE id=?")
+func deleteSecret(uuid string) error {
+	stmt, err := database.Prepare("DELETE FROM otp WHERE uuid=?")
 	if err != nil {
 		fmt.Println("Error preparing deleteSecret query")
 		return err
 	}
 
-	_, err = stmt.Exec(id)
+	_, err = stmt.Exec(uuid)
 
 	if err != nil {
 		fmt.Println("Error executing query")
@@ -94,12 +102,12 @@ func deleteSecret(id string) error {
 	return nil
 }
 
-func ReturnSecret(id string) (string, error) {
+func ReturnSecret(uuid string) (string, error) {
 
 	var secret string
 	var expiration int64
 
-	rows := database.QueryRow("SELECT secret, expiration FROM otp WHERE id=?", id)
+	rows := database.QueryRow("SELECT secret, expiration FROM otp WHERE uuid=?", uuid)
 	/*
 		if err != nil {
 			fmt.Println("Error querying database to get secret")
@@ -114,13 +122,13 @@ func ReturnSecret(id string) (string, error) {
 	case nil:
 		if time.Now().Unix() > expiration {
 			e := errors.New("expired")
-			_ = deleteSecret(id)
+			_ = deleteSecret(uuid)
 
 			return "Secret expired", e
 
 		}
 
-		_ = deleteSecret(id)
+		_ = deleteSecret(uuid)
 
 		return secret, nil
 
