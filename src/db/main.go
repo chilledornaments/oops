@@ -47,15 +47,15 @@ func main() {
 
 }
 
-func AddSecret(s string) error {
+func AddSecret(s string, exp int64) error {
 
-	stmt, err := database.Prepare("INSERT INTO otp (id, secret) VALUES (1, ?)")
+	stmt, err := database.Prepare("INSERT INTO otp (secret, expiration) VALUES (?, ?)")
 	if err != nil {
 		fmt.Println("Error preparing query")
 		return err
 	}
 
-	_, err = stmt.Exec(s)
+	_, err = stmt.Exec(s, exp)
 
 	if err != nil {
 		fmt.Println("Error executing query")
