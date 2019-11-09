@@ -2,12 +2,18 @@ package main
 
 import (
 	"fmt"
-	db "github.com/mitchya1/onetimepass/src/db"
 	"log"
 	"net/http"
+
+	db "github.com/mitchya1/onetimepass/src/db"
 )
 
-func createSecret(w http.ResponseWriter, r *http.Request) {
+type newSecret struct {
+	Secret     string `json:"secret"`
+	Expiration string `json:"expiration"`
+}
+
+func secrets(w http.ResponseWriter, r *http.Request) {
 	fmt.Println(r.Method)
 	if r.Method == "GET" {
 
@@ -24,7 +30,8 @@ func createSecret(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 	fmt.Println("Starting the OTP web server")
+	//db.Init()
 
-	http.HandleFunc("/create", createSecret)
+	http.HandleFunc("/create", secrets)
 	log.Fatal(http.ListenAndServe(":8081", nil))
 }
