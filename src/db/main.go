@@ -2,15 +2,23 @@ package onetimepass
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
+	"log"
+	"time"
 
 	_ "github.com/mattn/go-sqlite3"
 )
 
 var (
 	database *sql.DB
-	//err      error
 )
+
+type secretRecord struct {
+	ID         int
+	Secret     string
+	Expiration time.Time
+}
 
 func init() {
 
@@ -21,8 +29,6 @@ func init() {
 	if err != nil {
 		panic("Unable to create database")
 	}
-
-	//defer database.Close()
 
 	err = database.Ping()
 
@@ -47,15 +53,39 @@ func main() {
 
 }
 
-func AddSecret(s string, exp int64) error {
+func AddSecret(s string, exp int64) (int64, error) {
 
 	stmt, err := database.Prepare("INSERT INTO otp (secret, expiration) VALUES (?, ?)")
 	if err != nil {
 		fmt.Println("Error preparing query")
+		return 0, err
+	}
+
+	r, err := stmt.Exec(s, exp)
+
+	if err != nil {
+		fmt.Println("Error executing query")
+		return 0, err
+	}
+
+	id, err := r.LastInsertId()
+
+	if err != nil {
+		fmt.Println("Error retrieving last inserted ID")
+		return 0, err
+	}
+
+	return id, nil
+}
+
+func deleteSecret(id string) error {
+	stmt, err := database.Prepare("DELETE FROM otp WHERE id=?")
+	if err != nil {
+		fmt.Println("Error preparing deleteSecret query")
 		return err
 	}
 
-	_, err = stmt.Exec(s, exp)
+	_, err = stmt.Exec(id)
 
 	if err != nil {
 		fmt.Println("Error executing query")
@@ -63,4 +93,43 @@ func AddSecret(s string, exp int64) error {
 	}
 
 	return nil
+}
+
+func ReturnSecret(id string) (string, error) {
+
+	var secret string
+	var expiration int64
+
+	rows, err := database.Query("SELECT secret, expiration FROM otp WHERE id=?")
+	if err != nil {
+		fmt.Println("Error preparing ReturnSecret query")
+		return "internal", err
+	}
+
+	defer rows.Close()
+
+	for rows.Next() {
+		err := rows.Scan(&secret, &expiration)
+		if err != nil {
+			fmt.Println("Error scanning result")
+			return "internal", err
+		}
+	}
+
+	err = rows.Err()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	if time.Now().Unix() > expiration {
+		e := errors.New("Expired")
+
+		_ = deleteSecret(id)
+
+		return "expired", e
+
+	}
+
+	return secret, nil
+
 }

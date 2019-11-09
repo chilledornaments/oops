@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strings"
 	"time"
 
 	db "github.com/mitchya1/onetimepass/src/db"
@@ -14,7 +15,7 @@ type newSecret struct {
 	Secret string `json:"secret"`
 }
 
-func secrets(w http.ResponseWriter, r *http.Request) {
+func createSecret(w http.ResponseWriter, r *http.Request) {
 	fmt.Println(r.Method)
 	if r.Method == "GET" {
 		http.ServeFile(w, r, "static/create.html")
@@ -28,12 +29,13 @@ func secrets(w http.ResponseWriter, r *http.Request) {
 		}
 		n := time.Now().Unix()
 		expiration := n + 3600
-		err = db.AddSecret(s.Secret, expiration)
+		id, err := db.AddSecret(s.Secret, expiration)
 		if err != nil {
 			log.Println("Error inserting secret into DB")
 			log.Println(err)
 			w.Write([]byte("Error creating secret"))
 		} else {
+			log.Println("ID:", id)
 			http.ServeFile(w, r, "static/created.html")
 		}
 
@@ -43,10 +45,28 @@ func secrets(w http.ResponseWriter, r *http.Request) {
 
 }
 
+func showSecret(w http.ResponseWriter, r *http.Request) {
+
+	if r.Method == "GET" {
+		id := strings.TrimPrefix(r.URL.Path, "/secret/")
+		secret, err := db.ReturnSecret(id)
+
+		if err != nil {
+			w.Write([]byte("Error retrieving secret"))
+		} else {
+			w.Write([]byte(secret))
+		}
+
+	} else {
+		w.Write([]byte("Method not allowed"))
+	}
+}
+
 func main() {
 	fmt.Println("Starting the OTP web server")
 	//db.Init()
 
-	http.HandleFunc("/create", secrets)
+	http.HandleFunc("/create", createSecret)
+	http.HandleFunc("/secret/", showSecret)
 	log.Fatal(http.ListenAndServe(":8081", nil))
 }
