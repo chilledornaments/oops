@@ -30,13 +30,16 @@ func createSecret(w http.ResponseWriter, r *http.Request) {
 		n := time.Now().Unix()
 		expiration := n + 3600
 		id, err := db.AddSecret(s.Secret, expiration)
+
 		if err != nil {
 			log.Println("Error inserting secret into DB")
 			log.Println(err)
 			w.Write([]byte("Error creating secret"))
 		} else {
 			log.Println("ID:", id)
-			http.ServeFile(w, r, "static/created.html")
+			b := fmt.Sprintf("Secret URL: %s/%d\n", "http://localhost:8081/secret", id)
+			w.Write([]byte(b))
+			//http.ServeFile(w, r, "static/created.html")
 		}
 
 	} else {

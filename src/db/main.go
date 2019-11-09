@@ -52,7 +52,7 @@ func main() {
 
 }
 
-func AddSecret(s string, exp int64) (int64, error) {
+func AddSecret(s string, exp int64) (int, error) {
 
 	stmt, err := database.Prepare("INSERT INTO otp (secret, expiration) VALUES (?, ?)")
 	if err != nil {
@@ -74,7 +74,7 @@ func AddSecret(s string, exp int64) (int64, error) {
 		return 0, err
 	}
 
-	return id, nil
+	return int(id), nil
 }
 
 func deleteSecret(id string) error {
