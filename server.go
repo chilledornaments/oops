@@ -54,7 +54,7 @@ func showSecret(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			w.Write([]byte("Error retrieving secret"))
 		} else {
-			w.Write([]byte(secret))
+			w.Write([]byte(secret + "\n"))
 		}
 
 	} else {

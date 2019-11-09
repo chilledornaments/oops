@@ -100,9 +100,11 @@ func ReturnSecret(id string) (string, error) {
 	var secret string
 	var expiration int64
 
-	rows, err := database.Query("SELECT secret, expiration FROM otp WHERE id=?")
+	rows, err := database.Query("SELECT secret, expiration FROM otp WHERE id=?", id)
+
 	if err != nil {
 		fmt.Println("Error preparing ReturnSecret query")
+		fmt.Println(err)
 		return "internal", err
 	}
 
