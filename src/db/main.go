@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
-	"log"
 	"time"
 
 	_ "github.com/mattn/go-sqlite3"
@@ -100,38 +99,34 @@ func ReturnSecret(id string) (string, error) {
 	var secret string
 	var expiration int64
 
-	rows, err := database.Query("SELECT secret, expiration FROM otp WHERE id=?", id)
-
-	if err != nil {
-		fmt.Println("Error preparing ReturnSecret query")
-		fmt.Println(err)
-		return "internal", err
-	}
-
-	defer rows.Close()
-
-	for rows.Next() {
-		err := rows.Scan(&secret, &expiration)
+	rows := database.QueryRow("SELECT secret, expiration FROM otp WHERE id=?", id)
+	/*
 		if err != nil {
-			fmt.Println("Error scanning result")
-			return "internal", err
+			fmt.Println("Error querying database to get secret")
+			log.Println(err)
+			return "Internal error", err
 		}
-	}
+	*/
 
-	err = rows.Err()
-	if err != nil {
-		log.Fatal(err)
-	}
+	switch err := rows.Scan(&secret, &expiration); err {
+	case sql.ErrNoRows:
+		return "Secret not found", errors.New("empty")
+	case nil:
+		if time.Now().Unix() > expiration {
+			e := errors.New("expired")
+			_ = deleteSecret(id)
 
-	if time.Now().Unix() > expiration {
-		e := errors.New("Expired")
+			return "Secret expired", e
+
+		}
 
 		_ = deleteSecret(id)
 
-		return "expired", e
+		return secret, nil
 
+	default:
+		fmt.Println(err)
+		return "Internal error", err
 	}
-
-	return secret, nil
 
 }

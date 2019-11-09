@@ -52,7 +52,7 @@ func showSecret(w http.ResponseWriter, r *http.Request) {
 		secret, err := db.ReturnSecret(id)
 
 		if err != nil {
-			w.Write([]byte("Error retrieving secret"))
+			w.Write([]byte(secret + "\n"))
 		} else {
 			w.Write([]byte(secret + "\n"))
 		}
