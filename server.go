@@ -5,9 +5,11 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"strings"
 	"time"
 
+	"github.com/joho/godotenv"
 	db "github.com/mitchya1/oops/src/db"
 )
 
@@ -16,7 +18,7 @@ type newSecret struct {
 }
 
 func createSecret(w http.ResponseWriter, r *http.Request) {
-	fmt.Println(r.Method)
+
 	if r.Method == "GET" {
 		http.ServeFile(w, r, "static/create.html")
 	} else if r.Method == "POST" {
@@ -37,9 +39,8 @@ func createSecret(w http.ResponseWriter, r *http.Request) {
 			w.Write([]byte("Error creating secret"))
 		} else {
 			log.Println("ID:", uuid)
-			b := fmt.Sprintf("Secret URL: %s/%s\n", "http://localhost:8081/secret", uuid)
+			b := fmt.Sprintf("Secret URL: %s/%s/%s\n", os.Getenv("SITE_URL"), "secret", uuid)
 			w.Write([]byte(b))
-			//http.ServeFile(w, r, "static/created.html")
 		}
 
 	} else {
@@ -68,8 +69,19 @@ func showSecret(w http.ResponseWriter, r *http.Request) {
 func main() {
 	fmt.Println("Starting the OOPS (OOPS One-time Password Sharing) web server")
 
+	err := godotenv.Load(os.Getenv("OTP_ENV_FILE"))
+	if err != nil {
+		fmt.Println(err)
+		log.Fatal("Error loading .env file")
+
+	}
+
+	log.Println("SITE_URL is", os.Getenv("SITE_URL"))
+	log.Println("WEB_SERVER_PORT is", os.Getenv("WEB_SERVER_PORT"))
+
 	http.HandleFunc("/", createSecret)
 	http.HandleFunc("/create", createSecret)
 	http.HandleFunc("/secret/", showSecret)
-	log.Fatal(http.ListenAndServe(":8081", nil))
+	portString := fmt.Sprintf(":%s", os.Getenv("WEB_SERVER_PORT"))
+	log.Fatal(http.ListenAndServe(portString, nil))
 }
