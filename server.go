@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"html/template"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -36,13 +35,14 @@ func createSecret(w http.ResponseWriter, r *http.Request) {
 
 	} else if r.Method == "POST" {
 		// Need to remove after debugging
-		i, _ := ioutil.ReadAll(r.Body)
-		fmt.Println(string(i))
+		//i, _ := ioutil.ReadAll(r.Body)
+		//fmt.Println(string(i))
 		s := newSecret{}
 		decoder := json.NewDecoder(r.Body)
 		err := decoder.Decode(&s)
 		if err != nil {
 			log.Println("Error decoding JSON request to create new secret")
+			log.Println(err)
 			w.Write([]byte("Error reading incoming JSON"))
 		} else {
 			n := time.Now().Unix()

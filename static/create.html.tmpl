@@ -17,16 +17,20 @@ Secret: <input type="text" name="secret" value="" autocomplete="off" spellcheck=
 <button value="Create" style="height:30px;width:100px" type="button" id="btn">
 </form>
 
-<script language ="javascript" type = "text/javascript" >
-
+<script>
 $("#btn").click(function(){
-  $.post({{ .CreateEndpoint }},
-  {
-    secret: $("#secretinput").val()
-  },
-  function(data, status){
-    console.log(data);
-  });
+var arr = { secret: $("#secretinput").val() };
+$.ajax({
+    url: {{ .CreateEndpoint }},
+    type: 'POST',
+    data: JSON.stringify(arr),
+    contentType: 'application/json; charset=utf-8',
+    dataType: 'json',
+    async: false,
+    success: function(msg) {
+        console.log(msg);
+    }
+});
 });
 
 </script>
