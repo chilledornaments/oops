@@ -9,6 +9,7 @@ import (
 	"os"
 	"strings"
 	"time"
+	"io/ioutil"
 
 	"github.com/joho/godotenv"
 	db "github.com/mitchya1/oops/src/db"
@@ -100,6 +101,21 @@ func showSecret(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func cssFiles(w http.ResponseWriter, r *http.Request) {
+	path := r.URL.Path[1:]
+	data, err := ioutil.ReadFile(string(path))
+	if err != nil {
+		w.Write([]byte("Error loading css file"))
+	} else {
+		w.Header().Set("Content-Type", "text/css; charset=utf-8")
+
+		w.Write(data)
+
+	}
+
+	//http.FileServer(http.Dir("css/"))
+}
+
 func main() {
 	fmt.Println("Starting the OOPS (OOPS One-time Password Sharing) web server")
 
@@ -112,7 +128,7 @@ func main() {
 
 	log.Println("SITE_URL is", os.Getenv("SITE_URL"))
 	log.Println("WEB_SERVER_PORT is", os.Getenv("WEB_SERVER_PORT"))
-
+	http.HandleFunc("/css/", cssFiles)
 	http.HandleFunc("/", createSecret)
 	http.HandleFunc("/create", createSecret)
 	http.HandleFunc("/secret/", showSecret)

@@ -1,0 +1,12 @@
+body {
+    text-align: center;
+    color: orange;
+    }
+
+.formContainer {
+    display: flex;
+    flex-direction: column;
+    width: 60%;
+    height: 60%;
+    background-color: yellow;
+}

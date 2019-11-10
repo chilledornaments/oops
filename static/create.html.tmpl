@@ -1,22 +1,18 @@
+<!DOCTYPE html>
 <html>
 <head>
     <title>OOPS</title>
-    <style>
-        body {
-        background-color: black;
-        text-align: center;
-        color: red;
-        }
-    </style>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <link rel="stylesheet" type="text/css"  href="/css/theme.css" >
 </head>
 <body>
-<form id="f" method="post">
-Secret: <input type="text" name="secret" value="" autocomplete="off" spellcheck="false" id="secretinput" style="height:50px;width:100px"><br>
+<div class='formContainer'>
+<form id="form" method="post">
+Secret: <input type="text" name="secret" value="" autocomplete="off" spellcheck="false" id="secretinput" ><br>
 <br>
-<button value="Create" style="height:30px;width:100px;color:#000" id="btn">Create<button/>
+<button value="Create"  id="btn">Create<button/>
 </form>
-
+</div>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 <script>
 $("#btn").click(function(){
 var arr = { secret: $("#secretinput").val() };
