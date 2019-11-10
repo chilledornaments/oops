@@ -34,7 +34,7 @@ type successJSON struct {
 func createSecret(w http.ResponseWriter, r *http.Request) {
 
 	if r.Method == "GET" {
-		tmpl := template.Must(template.ParseFiles("static/create.html.tmpl"))
+		tmpl := template.Must(template.ParseFiles("templates/create.html.tmpl"))
 		data := createTemplateData{
 			CreateEndpoint: fmt.Sprintf("%s/%s", os.Getenv("SITE_URL"), "create"),
 		}
