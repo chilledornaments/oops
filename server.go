@@ -8,7 +8,7 @@ import (
 	"strings"
 	"time"
 
-	db "github.com/mitchya1/onetimepass/src/db"
+	db "github.com/mitchya1/oops/src/db"
 )
 
 type newSecret struct {
@@ -66,9 +66,9 @@ func showSecret(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	fmt.Println("Starting the OTP web server")
-	//db.Init()
+	fmt.Println("Starting the OOPS (OOPS One-time Password Sharing) web server")
 
+	http.HandleFunc("/", createSecret)
 	http.HandleFunc("/create", createSecret)
 	http.HandleFunc("/secret/", showSecret)
 	log.Fatal(http.ListenAndServe(":8081", nil))

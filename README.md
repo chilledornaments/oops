@@ -1,5 +1,6 @@
-# onetimepass
+# OOPS
 
+OOPS One-time Password Sharing is a Go tool written to provide short-lived (one hour), one-time access to a secret
 
 ## Usage
 
