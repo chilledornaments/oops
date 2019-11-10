@@ -47,14 +47,14 @@ func init() {
 	}
 
 	if err != nil {
-		panic("Unable to create database")
+		panic("Unable to connect to database")
 	}
 
 	err = database.Ping()
 
 	if err != nil {
 		fmt.Println("Error pinging DB")
-		fmt.Println(err)
+		log.Fatal(err)
 	}
 
 	statement, _ := database.Prepare("CREATE TABLE IF NOT EXISTS otp (id INTEGER PRIMARY KEY AUTO_INCREMENT, secret TEXT, expiration INT, uuid TEXT)")
