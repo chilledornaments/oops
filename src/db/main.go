@@ -57,7 +57,7 @@ func init() {
 		fmt.Println(err)
 	}
 
-	statement, _ := database.Prepare("CREATE TABLE IF NOT EXISTS otp (id INTEGER PRIMARY KEY, secret TEXT, expiration INT, uuid TEXT)")
+	statement, _ := database.Prepare("CREATE TABLE IF NOT EXISTS otp (id INTEGER PRIMARY KEY AUTO_INCREMENT, secret TEXT, expiration INT, uuid TEXT)")
 
 	_, err = statement.Exec()
 
