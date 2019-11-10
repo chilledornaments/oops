@@ -10,6 +10,7 @@ import (
 	"os"
 	"time"
 
+	_ "github.com/go-sql-driver/mysql"
 	"github.com/joho/godotenv"
 	_ "github.com/mattn/go-sqlite3"
 )
@@ -28,7 +29,7 @@ func init() {
 
 	var err error
 
-	err = godotenv.Load()
+	err = godotenv.Load(os.Getenv("OTP_ENV_FILE"))
 	if err != nil {
 		fmt.Println(err)
 		log.Fatal("Error loading .env file")
