@@ -105,6 +105,8 @@ func cssFiles(w http.ResponseWriter, r *http.Request) {
 	path := r.URL.Path[1:]
 	data, err := ioutil.ReadFile(string(path))
 	if err != nil {
+		log.Println("Error loading CSS file")
+		log.Println("Tried to load", path)
 		w.Write([]byte("Error loading css file"))
 	} else {
 		w.Header().Set("Content-Type", "text/css; charset=utf-8")
@@ -112,8 +114,6 @@ func cssFiles(w http.ResponseWriter, r *http.Request) {
 		w.Write(data)
 
 	}
-
-	//http.FileServer(http.Dir("css/"))
 }
 
 func main() {
