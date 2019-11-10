@@ -27,9 +27,9 @@ $.ajax({
     contentType: 'application/json; charset=utf-8',
     dataType: 'json',
     async: false,
-    error: function(req, err){ console.log('my message' + err); },
+    error: function(req, err){ console.log('ERROR' + err); },
     success: function(msg) {
-        console.log(msg);
+        alert(msg.url);
     }
 });
 });

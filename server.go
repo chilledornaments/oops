@@ -63,6 +63,7 @@ func createSecret(w http.ResponseWriter, r *http.Request) {
 			} else {
 				log.Println("ID:", uuid)
 				b := fmt.Sprintf("Secret URL: %s/%s/%s", os.Getenv("SITE_URL"), "secret", uuid)
+
 				j := successJSON{
 					URL: b,
 				}
@@ -72,6 +73,7 @@ func createSecret(w http.ResponseWriter, r *http.Request) {
 					w.Write([]byte("Error creating JSON"))
 				}
 				w.Write([]byte(msg))
+
 				/*
 					tmpl := template.Must(template.ParseFiles("static/created.html.tmpl"))
 					data := successTemplateData{
