@@ -27,6 +27,7 @@ $.ajax({
     contentType: 'application/json; charset=utf-8',
     dataType: 'json',
     async: false,
+    error: function(req, err){ console.log('my message' + err); },
     success: function(msg) {
         console.log(msg);
     }

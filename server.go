@@ -26,6 +26,10 @@ type successTemplateData struct {
 	URL string
 }
 
+type successJSON struct {
+	URL string `json:"url"`
+}
+
 func createSecret(w http.ResponseWriter, r *http.Request) {
 
 	if r.Method == "GET" {
@@ -58,15 +62,26 @@ func createSecret(w http.ResponseWriter, r *http.Request) {
 				w.Write([]byte("Error creating secret"))
 			} else {
 				log.Println("ID:", uuid)
-				b := fmt.Sprintf("Secret URL: %s/%s/%s\n", os.Getenv("SITE_URL"), "secret", uuid)
-				tmpl := template.Must(template.ParseFiles("static/created.html.tmpl"))
-				data := successTemplateData{
+				b := fmt.Sprintf("Secret URL: %s/%s/%s", os.Getenv("SITE_URL"), "secret", uuid)
+				j := successJSON{
 					URL: b,
 				}
-				e := tmpl.Execute(w, data)
+				msg, e := json.Marshal(j)
 				if e != nil {
-					w.Write([]byte("Could not render template"))
+					log.Println("Error creating AJAX success JSON")
+					w.Write([]byte("Error creating JSON"))
 				}
+				w.Write([]byte(msg))
+				/*
+					tmpl := template.Must(template.ParseFiles("static/created.html.tmpl"))
+					data := successTemplateData{
+						URL: b,
+					}
+					e := tmpl.Execute(w, data)
+					if e != nil {
+						w.Write([]byte("Could not render template"))
+					}
+				*/
 			}
 		}
 
