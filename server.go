@@ -101,6 +101,7 @@ func showSecret(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// cssFiles serves, well, CSS files
 func cssFiles(w http.ResponseWriter, r *http.Request) {
 	path := r.URL.Path[1:]
 	data, err := ioutil.ReadFile(string(path))
@@ -110,7 +111,6 @@ func cssFiles(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("Error loading css file"))
 	} else {
 		w.Header().Set("Content-Type", "text/css; charset=utf-8")
-
 		w.Write(data)
 
 	}
