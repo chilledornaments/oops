@@ -1,0 +1,34 @@
+<html>
+<head>
+    <title>OOPS</title>
+    <style>
+        body {
+        background-color: black;
+        text-align: center;
+        color: white;
+        }
+    </style>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+</head>
+<body>
+<form id="f" method="post">
+Secret: <input type="text" name="secret" value="" autocomplete="off" spellcheck="false" id="secretinput" style="height:50px;width:100px"><br>
+<br>
+<button value="Create" style="height:30px;width:100px" type="button" id="btn">
+</form>
+
+<script language ="javascript" type = "text/javascript" >
+
+$("#btn").click(function(){
+  $.post({{ .CreateEndpoint }},
+  {
+    secret: $("#secretinput").val()
+  },
+  function(data, status){
+    console.log(data);
+  });
+});
+
+</script>
+
+</body>

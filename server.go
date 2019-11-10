@@ -3,6 +3,8 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"html/template"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -16,31 +18,46 @@ import (
 type newSecret struct {
 	Secret string `json:"secret"`
 }
+type createTemplateData struct {
+	CreateEndpoint string
+}
 
 func createSecret(w http.ResponseWriter, r *http.Request) {
 
 	if r.Method == "GET" {
-		http.ServeFile(w, r, "static/create.html")
+		tmpl := template.Must(template.ParseFiles("static/create.html.tmpl"))
+		data := createTemplateData{
+			CreateEndpoint: fmt.Sprintf("%s/%s", os.Getenv("SITE_URL"), "create"),
+		}
+		e := tmpl.Execute(w, data)
+		if e != nil {
+			w.Write([]byte("Could not render template"))
+		}
+
 	} else if r.Method == "POST" {
+		// Need to remove after debugging
+		i, _ := ioutil.ReadAll(r.Body)
+		fmt.Println(string(i))
 		s := newSecret{}
 		decoder := json.NewDecoder(r.Body)
 		err := decoder.Decode(&s)
 		if err != nil {
 			log.Println("Error decoding JSON request to create new secret")
 			w.Write([]byte("Error reading incoming JSON"))
-		}
-		n := time.Now().Unix()
-		expiration := n + 3600
-		uuid, err := db.AddSecret(s.Secret, expiration)
-
-		if err != nil {
-			log.Println("Error inserting secret into DB")
-			log.Println(err)
-			w.Write([]byte("Error creating secret"))
 		} else {
-			log.Println("ID:", uuid)
-			b := fmt.Sprintf("Secret URL: %s/%s/%s\n", os.Getenv("SITE_URL"), "secret", uuid)
-			w.Write([]byte(b))
+			n := time.Now().Unix()
+			expiration := n + 3600
+			uuid, err := db.AddSecret(s.Secret, expiration)
+
+			if err != nil {
+				log.Println("Error inserting secret into DB")
+				log.Println(err)
+				w.Write([]byte("Error creating secret"))
+			} else {
+				log.Println("ID:", uuid)
+				b := fmt.Sprintf("Secret URL: %s/%s/%s\n", os.Getenv("SITE_URL"), "secret", uuid)
+				w.Write([]byte(b))
+			}
 		}
 
 	} else {
