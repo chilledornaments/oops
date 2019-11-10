@@ -6,8 +6,11 @@ import (
 	"encoding/hex"
 	"errors"
 	"fmt"
+	"log"
+	"os"
 	"time"
 
+	"github.com/joho/godotenv"
 	_ "github.com/mattn/go-sqlite3"
 )
 
@@ -25,7 +28,22 @@ func init() {
 
 	var err error
 
-	database, err = sql.Open("sqlite3", "./otp.sql")
+	err = godotenv.Load()
+	if err != nil {
+		fmt.Println(err)
+		log.Fatal("Error loading .env file")
+
+	}
+
+	dbType := os.Getenv("DB_DRIVER")
+
+	switch dbType {
+	case "sqlite3":
+		database, err = sql.Open("sqlite3", os.Getenv("DB_PATH"))
+	case "mysql":
+		sqlString := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", os.Getenv("DB_USERNAME"), os.Getenv("DB_PASSWORD"), os.Getenv("DB_HOST"), os.Getenv("DB_PORT"), os.Getenv("DB_NAME"))
+		database, err = sql.Open("mysql", sqlString)
+	}
 
 	if err != nil {
 		panic("Unable to create database")
