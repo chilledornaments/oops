@@ -17,8 +17,13 @@ import (
 type newSecret struct {
 	Secret string `json:"secret"`
 }
+
 type createTemplateData struct {
 	CreateEndpoint string
+}
+
+type successTemplateData struct {
+	URL string
 }
 
 func createSecret(w http.ResponseWriter, r *http.Request) {
@@ -34,9 +39,7 @@ func createSecret(w http.ResponseWriter, r *http.Request) {
 		}
 
 	} else if r.Method == "POST" {
-		// Need to remove after debugging
-		//i, _ := ioutil.ReadAll(r.Body)
-		//fmt.Println(string(i))
+
 		s := newSecret{}
 		decoder := json.NewDecoder(r.Body)
 		err := decoder.Decode(&s)
@@ -56,7 +59,14 @@ func createSecret(w http.ResponseWriter, r *http.Request) {
 			} else {
 				log.Println("ID:", uuid)
 				b := fmt.Sprintf("Secret URL: %s/%s/%s\n", os.Getenv("SITE_URL"), "secret", uuid)
-				w.Write([]byte(b))
+				tmpl := template.Must(template.ParseFiles("static/created.html.tmpl"))
+				data := successTemplateData{
+					URL: b,
+				}
+				e := tmpl.Execute(w, data)
+				if e != nil {
+					w.Write([]byte("Could not render template"))
+				}
 			}
 		}
 
