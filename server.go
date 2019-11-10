@@ -74,16 +74,6 @@ func createSecret(w http.ResponseWriter, r *http.Request) {
 				}
 				w.Write([]byte(msg))
 
-				/*
-					tmpl := template.Must(template.ParseFiles("static/created.html.tmpl"))
-					data := successTemplateData{
-						URL: b,
-					}
-					e := tmpl.Execute(w, data)
-					if e != nil {
-						w.Write([]byte("Could not render template"))
-					}
-				*/
 			}
 		}
 
