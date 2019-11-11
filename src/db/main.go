@@ -6,13 +6,12 @@ import (
 	"encoding/hex"
 	"errors"
 	"fmt"
-	"log"
-	"os"
-	"time"
-
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/joho/godotenv"
 	_ "github.com/mattn/go-sqlite3"
+	"log"
+	"os"
+	"time"
 )
 
 var (
@@ -76,17 +75,13 @@ func init() {
 	_, err = statement.Exec()
 
 	if err != nil {
-		fmt.Println(err)
+		log.Println("Error initializing the database")
+		log.Fatal(err)
 	}
 
 }
 
-func main() {
-
-	fmt.Println("Hello from the database")
-
-}
-
+// AddSecret adds a secret to the database and returns the secrets UUID
 func AddSecret(s string, exp int64) (string, error) {
 
 	stmt, err := database.Prepare("INSERT INTO otp (secret, expiration, uuid) VALUES (?, ?, ?)")
@@ -126,19 +121,13 @@ func deleteSecret(uuid string) error {
 	return nil
 }
 
+// ReturnSecret returns the value of a secret if that secret is not more than an hour old and has not been viewed before
 func ReturnSecret(uuid string) (string, error) {
 
 	var secret string
 	var expiration int64
 
 	rows := database.QueryRow("SELECT secret, expiration FROM otp WHERE uuid=?", uuid)
-	/*
-		if err != nil {
-			fmt.Println("Error querying database to get secret")
-			log.Println(err)
-			return "Internal error", err
-		}
-	*/
 
 	switch err := rows.Scan(&secret, &expiration); err {
 	case sql.ErrNoRows:
@@ -152,7 +141,12 @@ func ReturnSecret(uuid string) (string, error) {
 
 		}
 
-		_ = deleteSecret(uuid)
+		err := deleteSecret(uuid)
+
+		if err != nil {
+			log.Println("Error deleting secret:", uuid)
+			log.Println(err)
+		}
 
 		return secret, nil
 
@@ -160,5 +154,6 @@ func ReturnSecret(uuid string) (string, error) {
 		fmt.Println(err)
 		return "Internal error", err
 	}
-
 }
+
+func main() {}
