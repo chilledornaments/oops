@@ -135,6 +135,7 @@ func main() {
 	log.Println("Starting the OOPS (OOPS One-time Password Sharing) web server")
 
 	err := godotenv.Load(os.Getenv("OOPS_ENV_FILE"))
+	log.Println("Using this env file:", os.Getenv("OOPS_ENV_FILE"))
 	if err != nil {
 		fmt.Println(err)
 		log.Fatal("Error loading .env file")
