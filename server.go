@@ -4,12 +4,12 @@ import (
 	"encoding/json"
 	"fmt"
 	"html/template"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
 	"strings"
 	"time"
-	"io/ioutil"
 
 	"github.com/joho/godotenv"
 	db "github.com/mitchya1/oops/src/db"
@@ -119,7 +119,7 @@ func cssFiles(w http.ResponseWriter, r *http.Request) {
 func main() {
 	fmt.Println("Starting the OOPS (OOPS One-time Password Sharing) web server")
 
-	err := godotenv.Load(os.Getenv("OTP_ENV_FILE"))
+	err := godotenv.Load(os.Getenv("OOPS_ENV_FILE"))
 	if err != nil {
 		fmt.Println(err)
 		log.Fatal("Error loading .env file")

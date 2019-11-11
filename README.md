@@ -12,7 +12,7 @@ You'll need to create the database first.
 
 ### .env File
 
-Set the `OTP_ENV_FILE` environment variable to the path of your config file for the application (this can be anywhere). You can reference the `.env.example` file for examples for mysql and sqlite.
+Set the `OOPS_ENV_FILE` environment variable to the path of your config file for the application (this can be anywhere). You can reference the `.env.example` file for examples for mysql and sqlite.
 
 ## Why
 
