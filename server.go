@@ -3,16 +3,16 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/joho/godotenv"
+	db "github.com/mitchya1/oops/src/db"
 	"html/template"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
+	"strconv"
 	"strings"
 	"time"
-
-	"github.com/joho/godotenv"
-	db "github.com/mitchya1/oops/src/db"
 )
 
 type newSecret struct {
@@ -133,5 +133,17 @@ func main() {
 	http.HandleFunc("/create", createSecret)
 	http.HandleFunc("/secret/", showSecret)
 	portString := fmt.Sprintf(":%s", os.Getenv("WEB_SERVER_PORT"))
-	log.Fatal(http.ListenAndServe(portString, nil))
+	tls, err := strconv.ParseBool(os.Getenv("SERVE_TLS"))
+	if err != nil {
+		log.Println("Unable to decide if we should server TLS. Double check your SERVE_TLS variable")
+		log.Fatal(err)
+	}
+	if tls {
+		log.Println("Serving TLS")
+		log.Fatal(http.ListenAndServeTLS(portString, os.Getenv("TLS_CERTIFICATE"), os.Getenv("TLS_KEY"), nil))
+	} else {
+
+		log.Fatal(http.ListenAndServe(portString, nil))
+	}
+
 }
