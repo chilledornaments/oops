@@ -68,6 +68,12 @@ Per the `net/http` documentation:
 If the certificate is signed by a certificate authority, the certFile should be the concatenation of the server's certificate, any intermediates, and the CA's certificate.
 ```
 
+### Building
+
+Run `rice embed-go`
+
+Run `go build`
+
 ## Why
 
 I use [One Time Secret](https://onetimesecret.com/) pretty frequently. Creating a self-destructing password sharing tool seemed like a fun problem to solve. It also has the added benefit of controlling the tool managing your secrets, not relying on a third party.
