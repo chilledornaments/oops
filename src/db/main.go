@@ -81,7 +81,7 @@ func AddSecret(s string, exp int64) (string, error) {
 		return "", err
 	}
 
-	b := make([]byte, 12) //equals 8 charachters
+	b := make([]byte, 16) //equals 8 charachters
 	rand.Read(b)
 	u := hex.EncodeToString(b)
 

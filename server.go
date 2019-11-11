@@ -63,7 +63,7 @@ func createSecret(w http.ResponseWriter, r *http.Request) {
 				w.Write([]byte("Error creating secret"))
 			} else {
 				log.Println("ID:", uuid)
-				b := fmt.Sprintf("Secret URL: %s/%s/%s", os.Getenv("SITE_URL"), "secret", uuid)
+				b := fmt.Sprintf("%s/%s/%s", os.Getenv("SITE_URL"), "secret", uuid)
 
 				j := successJSON{
 					URL: b,
