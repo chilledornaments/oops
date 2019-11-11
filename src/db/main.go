@@ -28,8 +28,14 @@ type secretRecord struct {
 func init() {
 
 	var err error
+	/*
+		SQLITE3 uses the AUTOINCREMENT attribute
+		MySQL uses the AUTO_INCREMENT attribute
+		Create a local var to store our DB init statement in so that we can switch between either type
+	*/
+	var initStatement string
 
-	err = godotenv.Load(os.Getenv("OTP_ENV_FILE"))
+	err = godotenv.Load(os.Getenv("OOPS_ENV_FILE"))
 	if err != nil {
 		fmt.Println(err)
 		log.Fatal("Error loading .env file")
@@ -40,10 +46,13 @@ func init() {
 
 	switch dbType {
 	case "sqlite3":
+		fmt.Println("Using SQLITE3 database at", os.Getenv("DB_PATH"))
 		database, err = sql.Open("sqlite3", os.Getenv("DB_PATH"))
+		initStatement = "CREATE TABLE IF NOT EXISTS otp (id INTEGER PRIMARY KEY AUTOINCREMENT, secret TEXT, expiration INT, uuid TEXT)"
 	case "mysql":
 		sqlString := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", os.Getenv("DB_USERNAME"), os.Getenv("DB_PASSWORD"), os.Getenv("DB_HOST"), os.Getenv("DB_PORT"), os.Getenv("DB_NAME"))
 		database, err = sql.Open("mysql", sqlString)
+		initStatement = "CREATE TABLE IF NOT EXISTS otp (id INTEGER PRIMARY KEY AUTO_INCREMENT, secret TEXT, expiration INT, uuid TEXT)"
 	}
 
 	if err != nil {
@@ -57,7 +66,12 @@ func init() {
 		log.Fatal(err)
 	}
 
-	statement, _ := database.Prepare("CREATE TABLE IF NOT EXISTS otp (id INTEGER PRIMARY KEY AUTO_INCREMENT, secret TEXT, expiration INT, uuid TEXT)")
+	statement, err := database.Prepare(initStatement)
+
+	if err != nil {
+		log.Println("Error preparing DB init statement")
+		log.Fatal(err)
+	}
 
 	_, err = statement.Exec()
 
@@ -81,7 +95,7 @@ func AddSecret(s string, exp int64) (string, error) {
 		return "", err
 	}
 
-	b := make([]byte, 16) //equals 8 charachters
+	b := make([]byte, 16)
 	rand.Read(b)
 	u := hex.EncodeToString(b)
 
@@ -91,15 +105,6 @@ func AddSecret(s string, exp int64) (string, error) {
 		fmt.Println("Error executing query")
 		return "", err
 	}
-
-	/*
-		id, err := r.LastInsertId()
-
-		if err != nil {
-			fmt.Println("Error retrieving last inserted ID")
-			return "", err
-		}
-	*/
 
 	return u, nil
 }
