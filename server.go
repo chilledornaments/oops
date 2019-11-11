@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/GeertJohan/go.rice"
 	"github.com/joho/godotenv"
 	db "github.com/mitchya1/oops/src/db"
 	"html/template"
@@ -34,14 +35,28 @@ type successJSON struct {
 func createSecret(w http.ResponseWriter, r *http.Request) {
 
 	if r.Method == "GET" {
-		tmpl := template.Must(template.ParseFiles("templates/create.html.tmpl"))
+
+		templateBox, err := rice.FindBox("templates")
+
+		templateString, err := templateBox.String("create.html.tmpl")
+
+		if err != nil {
+			log.Println("Unable to find secret create template")
+			log.Fatal(err)
+		}
+
 		data := createTemplateData{
 			CreateEndpoint: fmt.Sprintf("%s/%s", os.Getenv("SITE_URL"), "create"),
 		}
-		e := tmpl.Execute(w, data)
-		if e != nil {
-			w.Write([]byte("Could not render template"))
+
+		tmplMessage, err := template.New("create").Parse(templateString)
+
+		if err != nil {
+			log.Println("Unable to parse secret create template")
+			log.Fatal(err)
 		}
+
+		tmplMessage.Execute(w, data)
 
 	} else if r.Method == "POST" {
 
@@ -126,9 +141,13 @@ func main() {
 
 	}
 
+	cssBox := rice.MustFindBox("css")
+
 	log.Println("SITE_URL is", os.Getenv("SITE_URL"))
 	log.Println("WEB_SERVER_PORT is", os.Getenv("WEB_SERVER_PORT"))
-	http.HandleFunc("/css/", cssFiles)
+
+	cssFileServer := http.StripPrefix("/css/", http.FileServer(cssBox.HTTPBox()))
+	http.Handle("/css/", cssFileServer)
 	http.HandleFunc("/", createSecret)
 	http.HandleFunc("/create", createSecret)
 	http.HandleFunc("/secret/", showSecret)
