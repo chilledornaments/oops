@@ -1,12 +1,67 @@
 body {
-    text-align: center;
-    color: orange;
-    }
+    padding-top: 15%;
+    background-color: #fcfcfc;
+}
 
-.formContainer {
+h2 {
+    margin-top: 30px;
+    font-size: 30px;
+}
+
+.container { 
+    padding: 15px;
+    width: 700px;
+    height: 310px;
+    margin: 0 auto; 
+    border: solid 3px #C5CACC;
+    background-color: #E3E8EA;
+    border-radius: 20px;
     display: flex;
     flex-direction: column;
-    width: 60%;
-    height: 60%;
-    background-color: yellow;
+    align-items: center;
+    box-shadow: 0 10px 16px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19) 
+}
+
+.createButton {
+    box-sizing: border-box;
+    margin-top: 55px;
+    margin-bottom: 40px;
+    height: 50px;
+    width: 150px;
+    border-radius: 5px;
+    background-color: black;
+    outline: none;
+    color: white;
+    border: 1px solid white;
+    font-size: 20px;
+    align-self: center;
+}
+
+.form {
+    align-self: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+}
+
+.passwordLink {
+    color: #DB0000;
+    font-size: 25px;
+    align-self: center;
+}
+
+.secret {
+    display: flex;
+    margin-top: 20px;
+    margin-right: 100px;
+}
+
+.textArea {
+    width: 200px;
+    height: 70px;
+    border: 2px solid black;
+    padding: 5px;
+    margin-left: 15px;
+    border-radius: 8px;
+    outline: none;
 }

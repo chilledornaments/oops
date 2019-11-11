@@ -5,13 +5,21 @@
     <link rel="stylesheet" type="text/css"  href="/css/theme.css" >
 </head>
 <body>
-<div class='formContainer'>
-<form id="form" method="post">
-Secret: <input type="text" name="secret" value="" autocomplete="off" spellcheck="false" id="secretinput" ><br>
-<br>
-<button value="Create"  id="btn">Create<button/>
-</form>
-</div>
+        <div class="container">
+            <form class="form" id="form" method="post">
+                <div class="secret"> 
+                    <h2> Secret:</h2> 
+                    <textarea class="textArea" name="message" rows="5" cols="20" ype="text" name="secret" value="" autocomplete="off" spellcheck="false" id="secretinput"></textarea>
+                  
+                </div>  
+                  <input type="button" class="createButton" id="btn" value="Create" />
+            </form>
+            <div>
+                <p id="passwordLink" class="passwordLink" value="HI"></p>
+            <div>
+        <div /> 
+
+    </div>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 <script>
 $("#btn").click(function(){
@@ -25,7 +33,7 @@ $.ajax({
     async: false,
     error: function(req, err){ console.log('ERROR' + err); },
     success: function(msg) {
-        alert(msg.url);
+      document.getElementById('passwordLink').innerHTML =  (msg.url) 
     }
 });
 });
