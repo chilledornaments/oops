@@ -56,6 +56,8 @@ You need to provide values for `SITE_URL` and `WEB_SERVER_PORT`.
 
 `WEB_SERVER_PORT` defines what port the server listens on. Define this even if you're using a standard web server port.
 
+You can set `LINK_EXPIRATION_TIME` to specify how long (in seconds) a link is valid for. If you don't specify a value, the app will default to 3600 seconds (one hour)
+
 #### TLS
 
 If you want to serve the site over TLS (and you really should), set `SERVE_TLS=true`.

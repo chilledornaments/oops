@@ -32,6 +32,8 @@ type successJSON struct {
 	URL string `json:"url"`
 }
 
+var expirationInSeconds int64
+
 func createSecret(w http.ResponseWriter, r *http.Request) {
 
 	if r.Method == "GET" {
@@ -69,7 +71,7 @@ func createSecret(w http.ResponseWriter, r *http.Request) {
 			w.Write([]byte("Error reading incoming JSON"))
 		} else {
 			n := time.Now().Unix()
-			expiration := n + 3600
+			expiration := n + expirationInSeconds
 			uuid, err := db.AddSecret(s.Secret, expiration)
 
 			if err != nil {
@@ -143,6 +145,20 @@ func main() {
 	}
 
 	cssBox := rice.MustFindBox("css")
+
+	if os.Getenv("LINK_EXPIRATION_TIME") == "" {
+		log.Println("LINK_EXPIRATION_TIME not set in env file. Using 3600")
+		expirationInSeconds = 3600
+	} else {
+
+		convertedString, err := strconv.ParseInt(os.Getenv("LINK_EXPIRATION_TIME"), 10, 64)
+
+		if err != nil {
+			panic("Unable to convert string to int")
+		}
+		log.Println("Expiration is", convertedString)
+		expirationInSeconds = convertedString
+	}
 
 	log.Println("SITE_URL is", os.Getenv("SITE_URL"))
 	log.Println("WEB_SERVER_PORT is", os.Getenv("WEB_SERVER_PORT"))
