@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/GeertJohan/go.rice"
 	"github.com/joho/godotenv"
 	db "github.com/mitchya1/oops/src/db"
 	"html/template"
@@ -31,17 +32,33 @@ type successJSON struct {
 	URL string `json:"url"`
 }
 
+var expirationInSeconds int64
+
 func createSecret(w http.ResponseWriter, r *http.Request) {
 
 	if r.Method == "GET" {
-		tmpl := template.Must(template.ParseFiles("templates/create.html.tmpl"))
+
+		templateBox, err := rice.FindBox("templates")
+
+		templateString, err := templateBox.String("create.html.tmpl")
+
+		if err != nil {
+			log.Println("Unable to find secret create template")
+			log.Fatal(err)
+		}
+
 		data := createTemplateData{
 			CreateEndpoint: fmt.Sprintf("%s/%s", os.Getenv("SITE_URL"), "create"),
 		}
-		e := tmpl.Execute(w, data)
-		if e != nil {
-			w.Write([]byte("Could not render template"))
+
+		tmplMessage, err := template.New("create").Parse(templateString)
+
+		if err != nil {
+			log.Println("Unable to parse secret create template")
+			log.Fatal(err)
 		}
+
+		tmplMessage.Execute(w, data)
 
 	} else if r.Method == "POST" {
 
@@ -54,7 +71,7 @@ func createSecret(w http.ResponseWriter, r *http.Request) {
 			w.Write([]byte("Error reading incoming JSON"))
 		} else {
 			n := time.Now().Unix()
-			expiration := n + 3600
+			expiration := n + expirationInSeconds
 			uuid, err := db.AddSecret(s.Secret, expiration)
 
 			if err != nil {
@@ -117,18 +134,37 @@ func cssFiles(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	fmt.Println("Starting the OOPS (OOPS One-time Password Sharing) web server")
+	log.Println("Starting the OOPS (OOPS One-time Password Sharing) web server")
 
 	err := godotenv.Load(os.Getenv("OOPS_ENV_FILE"))
+	log.Println("Using this env file:", os.Getenv("OOPS_ENV_FILE"))
 	if err != nil {
 		fmt.Println(err)
 		log.Fatal("Error loading .env file")
 
 	}
 
+	cssBox := rice.MustFindBox("css")
+
+	if os.Getenv("LINK_EXPIRATION_TIME") == "" {
+		log.Println("LINK_EXPIRATION_TIME not set in env file. Using 3600")
+		expirationInSeconds = 3600
+	} else {
+
+		convertedString, err := strconv.ParseInt(os.Getenv("LINK_EXPIRATION_TIME"), 10, 64)
+
+		if err != nil {
+			panic("Unable to convert string to int")
+		}
+		log.Println("Expiration is", convertedString)
+		expirationInSeconds = convertedString
+	}
+
 	log.Println("SITE_URL is", os.Getenv("SITE_URL"))
 	log.Println("WEB_SERVER_PORT is", os.Getenv("WEB_SERVER_PORT"))
-	http.HandleFunc("/css/", cssFiles)
+
+	cssFileServer := http.StripPrefix("/css/", http.FileServer(cssBox.HTTPBox()))
+	http.Handle("/css/", cssFileServer)
 	http.HandleFunc("/", createSecret)
 	http.HandleFunc("/create", createSecret)
 	http.HandleFunc("/secret/", showSecret)

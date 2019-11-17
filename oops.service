@@ -1,0 +1,17 @@
+[Unit]
+Description=OOPS One-time Password Sharing
+After=network.target
+
+[Service]
+Type=simple
+RemainAfterExit=no
+Environment=OOPS_ENV_FILE=/var/local/oops/.env
+ExecStart=/var/local/oops/oops
+Restart=on-failure
+RestartSec=10
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=oops
+
+[Install]
+WantedBy=multi-user.target
