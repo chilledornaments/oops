@@ -1,5 +1,8 @@
 name: Go
-on: [push]
+on:
+  push:
+    branches:
+      - master
 jobs:
 
   build:
@@ -28,7 +31,7 @@ jobs:
         go get -v -t -d ./...
         if [ -f Gopkg.toml ]; then
             curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
-            dep ensure
+            /home/runner/go/bin/dep ensure
         fi
 
     - name: Build
