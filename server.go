@@ -38,6 +38,10 @@ func createSecret(w http.ResponseWriter, r *http.Request) {
 
 	if r.Method == "GET" {
 
+		if strings.Contains(r.UserAgent(), "Slackbot") {
+			w.Write([]byte("Hello Slack"))
+		}
+
 		templateBox, err := rice.FindBox("templates")
 
 		templateString, err := templateBox.String("create.html.tmpl")
