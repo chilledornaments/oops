@@ -104,13 +104,21 @@ func createSecret(w http.ResponseWriter, r *http.Request) {
 func showSecret(w http.ResponseWriter, r *http.Request) {
 
 	if r.Method == "GET" {
-		id := strings.TrimPrefix(r.URL.Path, "/secret/")
-		secret, err := db.ReturnSecret(id)
 
-		if err != nil {
-			w.Write([]byte(secret + "\n"))
+		if strings.Contains(r.UserAgent(), "Slack") {
+			log.Println("Ignored Slack link expansion")
+			w.Write([]byte("Hello Slack"))
 		} else {
-			w.Write([]byte(secret + "\n"))
+
+			id := strings.TrimPrefix(r.URL.Path, "/secret/")
+			secret, err := db.ReturnSecret(id)
+
+			if err != nil {
+				w.Write([]byte(secret + "\n"))
+			} else {
+				w.Write([]byte(secret + "\n"))
+			}
+
 		}
 
 	} else {
