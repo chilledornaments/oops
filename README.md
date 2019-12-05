@@ -76,6 +76,14 @@ Run `rice embed-go`
 
 Run `go build`
 
+## Creating Secrets Programmatically
+
+`POST` a JSON to the `/create` endpoint. 
+
+Example JSON: `{"secret": "hello world"}`
+
+You'll receive a JSON response; grab the value of the `url` key
+
 ## Why
 
 I use [One Time Secret](https://onetimesecret.com/) pretty frequently. Creating a self-destructing password sharing tool seemed like a fun problem to solve. It also has the added benefit of controlling the tool managing your secrets, not relying on a third party.
