@@ -1,52 +1,39 @@
 # OOPS
 
-OOPS One-time Password Sharing is a Go tool written to provide short-lived (one hour), one-time access to a secret.
+OOPS One-time Password Sharing is a Go tool written to provide short-lived, one-time access to a secret.
 
 ## Usage
 
 ### Database
 
-You can either use MySQL/MariaDB or SQLite.
-
-If you're using MySQL, you'll need to create the database first:
-
-```mysql
-create database oops;
-
-grant all on oops.* to 'oopsuser'@'%' identified by 'oopsPASS';
-```
-
-Careful, `%` allows the user to connect to the database from anywhere. Use proper, layered access control to the database.
+You can either use DynamoDB or SQLite
 
 ### .env File
 
-Set the `OOPS_ENV_FILE` environment variable to the path of your config file for the application (this can be anywhere). You can reference the `.env.example` file for examples for mysql and sqlite.
+Set the `OOPS_ENV_FILE` environment variable to the path of your config file for the application (this can be anywhere). You can reference the `.env.example` file for examples for DynamoDB and SQLite.
 
 #### Database Connection
 
 ##### SQLITE3
 
-If you're using SQLITE3 (only recommended for development and small sites), you only need to set `DB_DRIVER` and `DB_PATH`.
+If you're using SQLITE3 (recommended for development and low traffic sites), you only need to set `DB_DRIVER` and `DB_PATH`.
 
 `DB_DRIVER` *must* by `sqlite3`
 
 `DB_PATH` is the path to where you want the SQLite database to live
 
-##### MySQL 
+##### DynamoDB
 
-If you're using MySQL/MariaDB you'll need to set `DB_DRIVER`, `DB_USERNAME`, `DB_PASSWORD`, `DB_HOST`, `DB_PORT`, and `DB_NAME`.
+You can use AWS DynamoDB as a datastore for OOPS. 
 
-`DB_DRIVER` *must* by `mysql`
+`DB_DRIVER` *must* be `dynamo`
 
-`DB_USERNAME` is the name of a user in the database that can select, insert, and delete
+`DYNAMO_TABLE_NAME` should be set to the name of the table to store records in
 
-`DB_PASSWORD` is the password of the above user
+When using DynamoDB, the application doesn't check for secret expiration. Instead, use DynamoDB TTL. It's important to note that DynamoDB TTL's don't always expire a secret exactly at expiration time. 
 
-`DB_HOST` is the hostname or IP address of the database server
+There is sample Terraform code to stand up the DynamoDB table along with an IAM role (for an EC2 instance) and an IAM policy to allow the role to interact with DynamoDB.
 
-`DB_PORT` is the port used to connect to the database
-
-`DB_NAME` is the name of the database you created
 
 #### Site Info
 
@@ -72,7 +59,7 @@ If the certificate is signed by a certificate authority, the certFile should be 
 
 ### Building
 
-Run `rice embed-go`
+Run `rice -v -i ./cmd embed-go`
 
 Run `go build`
 
