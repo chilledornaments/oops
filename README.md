@@ -61,7 +61,11 @@ If the certificate is signed by a certificate authority, the certFile should be 
 
 Run `rice -v -i ./cmd embed-go`
 
-Run `go build`
+Run `go build ./cmd`
+
+#### Docker
+
+The Dockerfile assumes you've already compiled the application as `server` (`go build -o server ./cmd`), have a valid settings file named `.env` in the project root, have a TLS public key in the project root named `pubkey.pem`, have a TLS private key in the project root named `privkey.pem`, and want to expose port 443.
 
 ## Creating Secrets Programmatically
 

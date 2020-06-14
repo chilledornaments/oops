@@ -1,8 +1,6 @@
 FROM golang:1.13-alpine
 
-RUN mkdir /var/local/oops
-
-RUN mkdir /var/local/oops/tls
+RUN mkdir -p /var/local/oops/tls
 
 COPY server /var/local/oops/server
 
