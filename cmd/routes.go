@@ -44,7 +44,7 @@ func createSecret(w http.ResponseWriter, r *http.Request) {
 		}
 
 		data := createTemplateData{
-			CreateEndpoint: fmt.Sprintf("%s/%s", os.Getenv("SITE_URL"), "create"),
+			CreateEndpoint: fmt.Sprintf("\"%s/%s\"", os.Getenv("SITE_URL"), "create"),
 		}
 
 		tmplMessage, err := template.New("create").Parse(templateString)
