@@ -21,7 +21,7 @@ func init() {
 	svc = dynamodb.New(awsSess)
 }
 
-func AddSecret(secret string, ttl int64) (string, error) {
+func AddDynamoSecret(secret string, ttl int64) (string, error) {
 
 	b := make([]byte, 16)
 	rand.Read(b)
@@ -58,7 +58,7 @@ func AddSecret(secret string, ttl int64) (string, error) {
 
 }
 
-func ReturnSecret(id string) (string, error) {
+func ReturnDynamoSecret(id string) (string, error) {
 
 	input := &dynamodb.GetItemInput{
 		TableName: aws.String(TableName),
@@ -85,7 +85,7 @@ func ReturnSecret(id string) (string, error) {
 		return "", nil
 	}
 
-	go deleteItemAfterView(id)
+	go deleteDynamoItemAfterView(id)
 
 	if item.Secret == "" {
 		return "Secret not found", nil
@@ -94,7 +94,7 @@ func ReturnSecret(id string) (string, error) {
 
 }
 
-func deleteItemAfterView(id string) error {
+func deleteDynamoItemAfterView(id string) error {
 
 	input := &dynamodb.DeleteItemInput{
 		TableName: aws.String(TableName),

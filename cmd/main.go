@@ -21,6 +21,16 @@ func main() {
 		log.Fatal("Error loading .env file")
 
 	}
+	useDynamo = false
+	useSQL = false
+
+	if os.Getenv("DB_DRIVER") == "sqlite3" {
+		useSQL = true
+	} else if os.Getenv("DB_DRIVER") == "dynamo" {
+		useDynamo = true
+	} else {
+		log.Fatal("Unable to determine database driver. Must be either sqlite3 or dynamo. Please check the README")
+	}
 
 	cssBox := rice.MustFindBox("../css")
 

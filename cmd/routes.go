@@ -11,7 +11,7 @@ import (
 	"text/template"
 	"time"
 
-	db "github.com/mitchya1/oops/internal"
+	internal "github.com/mitchya1/oops/internal"
 
 	rice "github.com/GeertJohan/go.rice"
 )
@@ -68,7 +68,11 @@ func createSecret(w http.ResponseWriter, r *http.Request) {
 		} else {
 			n := time.Now().Unix()
 			expiration := n + int64(expirationInSeconds)
-			uuid, err := db.AddSecret(s.Secret, expiration)
+			if useDynamo {
+				uuid, err = internal.AddDynamoSecret(s.Secret, expiration)
+			} else {
+				uuid, err = internal.AddSqliteSecret(s.Secret, expiration)
+			}
 
 			if err != nil {
 				log.Println("Error inserting secret into DB")
@@ -115,7 +119,11 @@ func showSecret(w http.ResponseWriter, r *http.Request) {
 		} else {
 
 			id := strings.TrimPrefix(r.URL.Path, "/secret/")
-			secret, err := db.ReturnSecret(id)
+			if useDynamo {
+				secret, err = internal.ReturnDynamoSecret(id)
+			} else {
+				secret, err = internal.ReturnSqliteSecret(id)
+			}
 
 			if err != nil {
 				w.WriteHeader(http.StatusInternalServerError)
