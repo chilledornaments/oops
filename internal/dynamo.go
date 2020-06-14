@@ -52,6 +52,8 @@ func AddSecret(secret string, ttl int64) (string, error) {
 		return "", err
 	}
 
+	log.Println("Created secret", u)
+
 	return u, nil
 
 }
@@ -62,7 +64,7 @@ func ReturnSecret(id string) (string, error) {
 		TableName: aws.String(TableName),
 		Key: map[string]*dynamodb.AttributeValue{
 			"OopsID": {
-				"S": aws.String(id),
+				S: aws.String(id),
 			},
 		},
 	}
@@ -76,18 +78,41 @@ func ReturnSecret(id string) (string, error) {
 
 	item := Secret{}
 
-	err = dynamodbattribute.UnmarshalMap(result, &item)
+	err = dynamodbattribute.UnmarshalMap(result.Item, &item)
 
 	if err != nil {
 		log.Println("Error unmarshalling DynamoDB respone", err.Error())
 		return "", nil
 	}
 
+	go deleteItemAfterView(id)
+
+	if item.Secret == "" {
+		return "Secret not found", nil
+	}
 	return item.Secret, nil
 
 }
 
-func deleteItemAfterView() error {
+func deleteItemAfterView(id string) error {
+
+	input := &dynamodb.DeleteItemInput{
+		TableName: aws.String(TableName),
+		Key: map[string]*dynamodb.AttributeValue{
+			"OopsID": {
+				S: aws.String(id),
+			},
+		},
+	}
+
+	_, err := svc.DeleteItem(input)
+
+	if err != nil {
+		log.Println("Error deleting entry from DynamoDB", err.Error())
+		return err
+	}
+
+	log.Println("Deleted secret", id)
 
 	return nil
 
