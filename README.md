@@ -2,6 +2,12 @@
 
 OOPS One-time Password Sharing is a Go tool written to provide short-lived (one hour), one-time access to a secret.
 
+## Important Notes
+
+This version has been deprecated in favor of v2, which drops support for MySQL and replaces it with DynamoDB. V2 still supports SQLite.
+
+Check out the `v2` branch!
+
 ## Usage
 
 ### Database
