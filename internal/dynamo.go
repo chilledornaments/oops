@@ -4,21 +4,27 @@ import (
 	"crypto/rand"
 	"encoding/hex"
 	"log"
+	"os"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/dynamodb"
 	"github.com/aws/aws-sdk-go/service/dynamodb/dynamodbattribute"
+	"github.com/joho/godotenv"
 )
 
 var awsSess *session.Session
 var svc *dynamodb.DynamoDB
 
 func init() {
-	//awsSess = session.Must(session.NewSession())
-	awsSess, _ = session.NewSession()
-	log.Println("Instantiated AWS Session")
-	svc = dynamodb.New(awsSess)
+	godotenv.Load(os.Getenv("OOPS_ENV_FILE"))
+
+	if os.Getenv("DB_TYPE") == "dynamo" {
+		awsSess, _ = session.NewSession()
+		log.Println("Instantiated AWS Session")
+		svc = dynamodb.New(awsSess)
+	}
+
 }
 
 func AddDynamoSecret(secret string, ttl int64) (string, error) {
