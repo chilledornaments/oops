@@ -1,4 +1,6 @@
-FROM golang:1.13-alpine
+FROM golang:1.13-buster
+
+RUN apt update && apt -y install ca-certificates 
 
 RUN mkdir -p /var/local/oops/tls
 

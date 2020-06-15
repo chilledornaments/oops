@@ -15,12 +15,16 @@ import (
 
 var awsSess *session.Session
 var svc *dynamodb.DynamoDB
+var err error
 
 func init() {
 	godotenv.Load(os.Getenv("OOPS_ENV_FILE"))
 
-	if os.Getenv("DB_TYPE") == "dynamo" {
-		awsSess, _ = session.NewSession()
+	if os.Getenv("DB_DRIVER") == "dynamo" {
+		awsSess, err = session.NewSession(&aws.Config{Region: aws.String(os.Getenv("AWS_REGION"))})
+		if err != nil {
+			panic("Unable to instantiate AWS session")
+		}
 		log.Println("Instantiated AWS Session")
 		svc = dynamodb.New(awsSess)
 	}
@@ -91,11 +95,12 @@ func ReturnDynamoSecret(id string) (string, error) {
 		return "", nil
 	}
 
-	go deleteDynamoItemAfterView(id)
-
 	if item.Secret == "" {
 		return "Secret not found", nil
 	}
+
+	go deleteDynamoItemAfterView(id)
+
 	return item.Secret, nil
 
 }
