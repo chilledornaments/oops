@@ -9,6 +9,6 @@ require (
 	github.com/gofiber/fiber v1.11.1
 	github.com/joho/godotenv v1.3.0
 	github.com/klauspost/compress v1.10.8 // indirect
-	github.com/mattn/go-sqlite3 v1.12.0
+	github.com/mattn/go-sqlite3 v1.14.3
 	google.golang.org/appengine v1.6.5
 )
