@@ -10,5 +10,5 @@ require (
 	github.com/joho/godotenv v1.3.0
 	github.com/klauspost/compress v1.10.8 // indirect
 	github.com/mattn/go-sqlite3 v1.14.3
-	google.golang.org/appengine v1.6.5
+	google.golang.org/appengine v1.6.6
 )
