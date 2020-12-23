@@ -14,7 +14,7 @@ jobs:
       fail-fast: true
       matrix:
         language: [ 'go' ]
-        python-version: [3.7]
+        python-version: [3.9]
 
     steps:
     - name: Checkout
@@ -31,7 +31,7 @@ jobs:
     - name: Run unit tests
       run: go test -v ./cmd
       env:
-        OOPS_ENV_FILE: "/home/runner/work/oops/oops/ptests/env"
+        OOPS_ENV_FILE: "/home/runner/work/oops/oops/tests/env"
       
       # The app has to be compiled with cgo enabled
     - name: Run Go Build
