@@ -67,8 +67,9 @@ func createSecret(w http.ResponseWriter, r *http.Request) {
 			w.Write([]byte("Error reading incoming JSON"))
 		} else {
 			n := time.Now().Unix()
-			expiration := n + int64(expirationInSeconds)
-			if useDynamo {
+			expiration := n + conf.Expiration
+			log.Println("Expiration is ", expiration)
+			if conf.UseDynamo {
 				uuid, err = internal.AddDynamoSecret(s.Secret, expiration)
 			} else {
 				uuid, err = internal.AddSqliteSecret(s.Secret, expiration)
@@ -80,24 +81,24 @@ func createSecret(w http.ResponseWriter, r *http.Request) {
 				w.WriteHeader(http.StatusInternalServerError)
 				w.Write([]byte("Error creating secret"))
 				return
-			} else {
-				log.Println("ID:", uuid)
-				b := fmt.Sprintf("%s/%s/%s", os.Getenv("SITE_URL"), "secret", uuid)
+			}
+			log.Println("ID:", uuid)
+			b := fmt.Sprintf("%s/%s/%s", os.Getenv("SITE_URL"), "secret", uuid)
 
-				j := successJSON{
-					URL: b,
-				}
-				msg, e := json.Marshal(j)
-				if e != nil {
-					log.Println("Error creating AJAX success JSON")
-					w.WriteHeader(http.StatusInternalServerError)
-					w.Write([]byte("Error creating JSON"))
-					return
-				}
-				w.WriteHeader(http.StatusOK)
-				w.Write([]byte(msg))
+			j := successJSON{
+				URL: b,
+			}
+			msg, e := json.Marshal(j)
+			if e != nil {
+				log.Println("Error creating AJAX success JSON")
+				w.WriteHeader(http.StatusInternalServerError)
+				w.Write([]byte("Error creating JSON"))
 				return
 			}
+			w.WriteHeader(http.StatusOK)
+			w.Write([]byte(msg))
+			return
+
 		}
 
 	} else {
@@ -116,30 +117,27 @@ func showSecret(w http.ResponseWriter, r *http.Request) {
 			log.Println("Ignored Slack link expansion")
 			w.Write([]byte("Hello Slack"))
 			return
-		} else {
-
-			id := strings.TrimPrefix(r.URL.Path, "/secret/")
-			if useDynamo {
-				secret, err = internal.ReturnDynamoSecret(id)
-			} else {
-				secret, err = internal.ReturnSqliteSecret(id)
-			}
-
-			if err != nil {
-				w.WriteHeader(http.StatusInternalServerError)
-				w.Write([]byte(secret + "\n"))
-				return
-			} else {
-				w.WriteHeader(http.StatusOK)
-				w.Write([]byte(secret + "\n"))
-				return
-			}
-
 		}
 
-	} else {
-		w.WriteHeader(http.StatusMethodNotAllowed)
-		w.Write([]byte("Method not allowed"))
+		id := strings.TrimPrefix(r.URL.Path, "/secret/")
+		if conf.UseDynamo {
+			secret, err = internal.ReturnDynamoSecret(id)
+		} else {
+			secret, err = internal.ReturnSqliteSecret(id)
+		}
+
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Write([]byte(secret + "\n"))
+			return
+		}
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte(secret + "\n"))
 		return
+
 	}
+	w.WriteHeader(http.StatusMethodNotAllowed)
+	w.Write([]byte("Method not allowed"))
+	return
+
 }

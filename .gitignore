@@ -16,3 +16,5 @@
 .env
 
 rice-box.go
+
+tmp/
