@@ -1,6 +1,6 @@
 module github.com/mitchya1/oops
 
-go 1.13
+go 1.15
 
 require (
 	github.com/GeertJohan/go.rice v1.0.0
