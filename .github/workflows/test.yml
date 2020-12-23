@@ -25,16 +25,13 @@ jobs:
       with:
         go-version: '^1.15.6'
 
-    - name: Show directory
-      run: ls; pwd
-
     - name: Run Go Vet
       run: go vet -race ./cmd
 
     - name: Run unit tests
       run: go test -v ./cmd
       env:
-        OOPS_ENV_FILE: "tests/env"
+        OOPS_ENV_FILE: "/home/runner/work/oops/oops/ptests/env"
       
       # The app has to be compiled with cgo enabled
     - name: Run Go Build
