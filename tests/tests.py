@@ -1,6 +1,7 @@
 import requests
 import json
 
+from os import environ
 from time import sleep
 
 def test_create_secret(tls: bool, url: str, secret: str) -> str:
@@ -35,8 +36,8 @@ def test_get_already_viewed_secret(tls: bool, url: str):
 
     r = requests.get(url, verify=tls)
 
-    if r.status_code == 200:
-        raise Exception(f"Status code was {r.status_code}")
+    if r.text.strip("\n") != "Secret not found":
+        raise Exception(f"Expected to receive 'Secret not found' message but got {r.text}")
 
     print("Unable to view already-viewed secret")
 
@@ -56,6 +57,9 @@ if __name__ == "__main__":
     test_get_already_viewed_secret(False, url)
     # Create new secret so we can test expiration
     url = test_create_secret(False, "http://localhost:8080" ,"testing-secret")
-    sleep(5)
-    test_expired_secret(False, url)
+    if environ.get("USING_DYNAMO"):
+        print("Skipping expiration tests for dynamo")
+    else:
+        sleep(5)
+        test_expired_secret(False, url)
 

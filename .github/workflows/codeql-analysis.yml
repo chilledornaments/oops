@@ -16,6 +16,13 @@ on:
   pull_request:
     # The branches below must be a subset of the branches above
     branches: [ v2 ]
+    paths-ignore:
+    - "tests/**"
+    - "terraform/**"
+    - "css/**"
+    - "templates/**"
+    - ".github/**"
+    
   schedule:
     - cron: '26 10 * * 5'
 

@@ -1,5 +1,7 @@
 # OOPS
 
+![CodeQL](https://github.com/mitchya1/oops/workflows/CodeQL/badge.svg) ![Tests](https://github.com/mitchya1/oops/workflows/Tests/badge.svg)
+
 OOPS One-time Password Sharing is a Go tool written to provide short-lived, one-time access to a secret.
 
 ## Usage
