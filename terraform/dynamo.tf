@@ -17,9 +17,9 @@ resource "aws_dynamodb_table" "oops_table" {
 
 
   tags = {
-    Name        = "oops"
-    Environment = "prod"
+    Name         = "oops"
+    Environment  = "prod"
     ManagingTeam = "SysEng"
-    CostCenter = "SysEng"
+    CostCenter   = "SysEng"
   }
 }
