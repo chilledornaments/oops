@@ -46,8 +46,13 @@ def test_expired_secret(tls: bool, url: str):
     
     r = requests.get(url, verify=tls)
 
-    if r.text.strip("\n") != "Secret expired":
-        raise Exception(f"Expected to receive 'Secret expired' message but got {r.text}")
+    # Response is different when using dynamo
+    if environ.get("USING_DYNAMO"):
+        if r.text.strip("\n") != "Secret not found":
+            raise Exception(f"Expected to receive 'Secret not found' message but got {r.text}")
+    else:
+        if r.text.strip("\n") != "Secret expired":
+            raise Exception(f"Expected to receive 'Secret expired' message but got {r.text}")
     
     print("Unable to view expired secret")
 
@@ -58,7 +63,7 @@ if __name__ == "__main__":
     # Create new secret so we can test expiration
     url = test_create_secret(False, "http://localhost:8080" ,"testing-secret")
     if environ.get("USING_DYNAMO"):
-        sleep(10)
+        sleep(15)
     else:
         sleep(5)
     test_expired_secret(False, url)
