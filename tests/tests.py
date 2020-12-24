@@ -35,8 +35,8 @@ def test_get_already_viewed_secret(tls: bool, url: str):
 
     r = requests.get(url, verify=tls)
 
-    if r.status_code == 200:
-        raise Exception(f"Status code was {r.status_code}")
+    if r.text.strip("\n") != "Secret not found":
+        raise Exception(f"Expected to receive 'Secret not found' message but got {r.text}")
 
     print("Unable to view already-viewed secret")
 
