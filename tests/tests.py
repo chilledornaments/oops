@@ -63,7 +63,7 @@ if __name__ == "__main__":
     # Create new secret so we can test expiration
     url = test_create_secret(False, "http://localhost:8080" ,"testing-secret")
     if environ.get("USING_DYNAMO"):
-        sleep(15)
+        sleep(60)
     else:
         sleep(5)
     test_expired_secret(False, url)
