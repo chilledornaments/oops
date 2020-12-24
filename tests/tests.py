@@ -1,6 +1,7 @@
 import requests
 import json
 
+from os import environ
 from time import sleep
 
 def test_create_secret(tls: bool, url: str, secret: str) -> str:
@@ -56,6 +57,9 @@ if __name__ == "__main__":
     test_get_already_viewed_secret(False, url)
     # Create new secret so we can test expiration
     url = test_create_secret(False, "http://localhost:8080" ,"testing-secret")
-    sleep(5)
+    if environ.get("USING_DYNAMO"):
+        sleep(10)
+    else:
+        sleep(5)
     test_expired_secret(False, url)
 

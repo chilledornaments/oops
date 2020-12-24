@@ -68,6 +68,7 @@ jobs:
         kill -9 $(lsof -i:8080 -t)
       env:
         OOPS_ENV_FILE: "/home/runner/work/oops/oops/tests/env-dynamo"
+        USING_DYNAMO: true
         AWS_REGION: "us-east-2"
         AWS_ACCESS_KEY_ID: ${{ secrets.CI_AWS_ACCESS_KEY }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.CI_AWS_SECRET_KEY }}
