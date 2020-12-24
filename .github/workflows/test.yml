@@ -51,13 +51,24 @@ jobs:
         python -m pip install --upgrade pip
         pip install --user -r tests/requirements.txt
 
-    - name: Run integration tests
+    - name: Run integration tests with sqlite
       run: |
         ./oops &
         sleep 1
         python tests/tests.py
         kill -9 $(lsof -i:8080 -t)
       env:
-        OOPS_ENV_FILE: "tests/env"
+        OOPS_ENV_FILE: "tests/env-sqlite"
 
+    - name: Run integration tests with dynamodb
+      run: |
+        ./oops &
+        sleep 1
+        python tests/tests.py
+        kill -9 $(lsof -i:8080 -t)
+      env:
+        OOPS_ENV_FILE: "tests/env-dynamo"
+        AWS_DEFAULT_REGION: "us-east-2"
+        AWS_ACCESS_KEY_ID: ${{ secrets.CI_AWS_ACCESS_KEY }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.CI_AWS_SECRET_KEY }}
     
