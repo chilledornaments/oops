@@ -61,5 +61,5 @@ if __name__ == "__main__":
         print("Skipping expiration tests for dynamo")
     else:
         sleep(5)
-    test_expired_secret(False, url)
+        test_expired_secret(False, url)
 
