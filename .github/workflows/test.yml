@@ -58,7 +58,7 @@ jobs:
         python tests/tests.py
         kill -9 $(lsof -i:8080 -t)
       env:
-        OOPS_ENV_FILE: "tests/env-sqlite"
+        OOPS_ENV_FILE: "/home/runner/work/oops/oops/tests/env-sqlite"
 
     - name: Run integration tests with dynamodb
       run: |
@@ -67,7 +67,7 @@ jobs:
         python tests/tests.py
         kill -9 $(lsof -i:8080 -t)
       env:
-        OOPS_ENV_FILE: "tests/env-dynamo"
+        OOPS_ENV_FILE: "/home/runner/work/oops/oops/tests/env-dynamo"
         AWS_DEFAULT_REGION: "us-east-2"
         AWS_ACCESS_KEY_ID: ${{ secrets.CI_AWS_ACCESS_KEY }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.CI_AWS_SECRET_KEY }}
